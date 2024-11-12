@@ -15,6 +15,28 @@ export const formLoginSchema = z.object({
     .max(15, 'Máximo 15 caracteres'),
 });
 
+export const formResetPassword = z.object({
+  contraseña: z
+    .string()
+    .trim()
+    .min(1, 'Se requiere')
+    .min(6, 'Mínimo 6 caracteres')
+    .max(15, 'Máximo 15 caracteres'),
+  confirmContraseña: z
+    .string()
+    .trim()
+    .min(1, 'Se requiere')
+    .min(6, 'Mínimo 6 caracteres')
+    .max(15, 'Máximo 15 caracteres'),
+})
+
+export const formCorreoSchema = z.object({
+  correo: z.string()
+    .trim()
+    .min(1, 'Se requiere')
+    .email('El correo no es válido'),
+})
+
 export const formAuthorSubjectSchema = z.object({
   nombre: z
     .string()

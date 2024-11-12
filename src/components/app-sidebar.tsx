@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -26,6 +27,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from './ui/collapsible';
+import { Button } from './ui/button';
 
 // Menu items.
 const items = [
@@ -100,7 +102,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <Separator className="mb-5" />
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className='flex justify-between'>
               {items.map((item, index) =>
                 item.subItem.length > 0 ? (
                   <Collapsible
@@ -168,6 +170,12 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 )
               )}
+
+              <SidebarFooter>
+                <Button>
+                  Cerrar Sesión
+                </Button>
+              </SidebarFooter>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
