@@ -74,7 +74,7 @@ const AlertDialogDeleteBook: React.FC<AlertDialogDeleteBookType> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>¿Estas seguro?</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no puede revertir. Eliminará permanentemente el libro.
+            Esta acción no puede revertir. Eliminará permanentemente el libro y sus prestamos.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

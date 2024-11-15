@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -29,11 +29,16 @@ import { Loader2 } from 'lucide-react';
 const ResetPasswordForm: React.FC = () => {
   const [formLoading, setFormLoading] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get('email');
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (!email) {
+      navigate('/auth/login');
+    }
+  }, [email, navigate]);
 
   const form = useForm<z.infer<typeof formResetPassword>>({
     resolver: zodResolver(formResetPassword),
@@ -62,15 +67,15 @@ const ResetPasswordForm: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/auth/reset-password`,
         {
           email,
-          password: values.contraseña
+          password: values.contraseña,
         }
       ),
       {
         loading: 'Guardando...',
         success: (res) => {
           if (res.status === 200) {
-            navigate('/library/admin/dashboard')
-            
+            navigate('/library/admin/dashboard');
+
             form.reset();
 
             setFormLoading(false);
@@ -107,11 +112,12 @@ const ResetPasswordForm: React.FC = () => {
         },
       }
     );
-
   };
 
   return (
-    <section className={`min-h-screen flex items-center justify-center bg-primary`}>
+    <section
+      className={`min-h-screen flex items-center justify-center bg-primary`}
+    >
       <Card
         className={`w-full max-w-md px-8 border-none bg-white rounded-xl shadow-2xl`}
       >
@@ -171,8 +177,9 @@ const ResetPasswordForm: React.FC = () => {
                 type="submit"
                 variant="default"
                 disabled={formLoading}
-                className={`${formLoading ? 'opacity-70 cursor-not-allowed' : ''
-                  } w-full`}
+                className={`${
+                  formLoading ? 'opacity-70 cursor-not-allowed' : ''
+                } w-full`}
               >
                 {formLoading && <Loader2 className="animate-spin" />}
 

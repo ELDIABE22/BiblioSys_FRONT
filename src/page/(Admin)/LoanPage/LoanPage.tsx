@@ -42,6 +42,7 @@ import AlertDialogDeleteLoan from './components/AlertDialogDeleteLoan/AlertDialo
 import { ExportToExcel } from '@/components/ExportToExcel';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExportToPDF, { ITableConfig } from '@/components/ExportToPDF';
+import { useAuth } from '@/hooks/useAuth';
 
 const LoanPage = () => {
   const [data, setData] = useState<ILoanData[] | []>([]);
@@ -52,6 +53,8 @@ const LoanPage = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const pageSize = 5;
+
+  const { user } = useAuth();
 
   const fetchLoans = async () => {
     try {
@@ -153,18 +156,36 @@ const LoanPage = () => {
     {
       accessorKey: 'estado',
       header: 'Estado',
-      cell: ({ row }) => (
-        <Badge
-          variant={
-            row.original.estado === 'Activo' ||
-            row.original.estado === 'Devuelto'
-              ? 'default'
-              : 'destructive'
-          }
-        >
-          {row.getValue('estado')}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const status = row.original.estado;
+        let color: 'default' | 'secondary' | 'destructive' | 'outline';
+
+        switch (status) {
+          case 'Activo':
+            color = 'default';
+            break;
+          case 'Devuelto':
+            color = 'secondary';
+            break;
+          case 'Vencido':
+            color = 'destructive';
+            break;
+          default:
+            color = 'default';
+            break;
+        }
+
+        return (
+          <Badge
+            className={`${
+              status === 'Devuelto' ? 'bg-green-500 text-white' : ''
+            }`}
+            variant={color}
+          >
+            {row.getValue('estado')}
+          </Badge>
+        );
+      },
     },
     {
       id: 'actions',
@@ -183,10 +204,12 @@ const LoanPage = () => {
               dataToUpdate={row.original}
               fetchLoans={fetchLoans}
             />
-            <AlertDialogDeleteLoan
-              loanId={row.original.id}
-              fetchLoans={fetchLoans}
-            />
+            {user?.rol === 'Administrador' && (
+              <AlertDialogDeleteLoan
+                loanId={row.original.id}
+                fetchLoans={fetchLoans}
+              />
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),

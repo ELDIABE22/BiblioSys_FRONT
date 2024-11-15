@@ -29,11 +29,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 import axiosInstance from '@/lib/axios';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
@@ -41,13 +41,9 @@ const LoginPage = () => {
   const [open, setOpen] = useState(false);
   const [formCorreoLoading, setFormCorreoLoading] = useState(false);
 
-  const {user} = useAuth();
+  const { user, loading } = useAuth();
 
   const navigate = useNavigate();
-
-  if (user) {
-    return navigate('/library/admin/dashboard');
-  }
 
   const form = useForm<z.infer<typeof formLoginSchema>>({
     resolver: zodResolver(formLoginSchema),
@@ -64,6 +60,12 @@ const LoginPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (user && !loading) {
+      return navigate('/library/admin/dashboard');
+    }
+  }, [user, navigate, loading]);
+
   const onSubmitPassword = async (values: z.infer<typeof formCorreoSchema>) => {
     setFormCorreoLoading(true);
 
@@ -79,7 +81,7 @@ const LoginPage = () => {
             setFormCorreoLoading(false);
 
             setOpen(false);
-            
+
             form.reset();
 
             return res.data.message;
@@ -114,14 +116,14 @@ const LoginPage = () => {
         },
       }
     );
-  }
+  };
 
   return (
     <section
       className={`min-h-screen flex items-center justify-center bg-primary`}
     >
       <Card
-        className={`w-full max-w-md px-8 border-none bg-white rounded-xl shadow-2xl`}
+        className={`w-full max-w-md px-3 sm:px-8 border-none bg-white rounded-xl shadow-2xl`}
       >
         <CardHeader
           className={`p-0 pt-8 flex gap-3 justify-center items-center flex-col text-gray-900`}
@@ -136,8 +138,8 @@ const LoginPage = () => {
           </div>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(signin)}>
-            <CardContent className="space-y-5">
+          <form onSubmit={form.handleSubmit(signin)} className='space-y-5 sm:space-x-0'>
+            <CardContent className="space-y-5 p-2 sm:p-6 sm:pt-0">
               <FormField
                 control={form.control}
                 name="usuario"
@@ -180,14 +182,16 @@ const LoginPage = () => {
                 )}
               />
             </CardContent>
-            <CardFooter className="flex flex-col gap-4">
-              <Dialog open={open}
+            <CardFooter className="flex flex-col gap-4 px-2 pb-6 sm:p-6 sm:pt-0">
+              <Dialog
+                open={open}
                 onOpenChange={(isOpen) => {
                   setOpen(isOpen);
                   if (isOpen) {
                     form.reset();
                   }
-                }}>
+                }}
+              >
                 <DialogTrigger asChild>
                   <span
                     className={`text-sm hover:underline cursor-pointer text-primary`}
@@ -196,15 +200,18 @@ const LoginPage = () => {
                   </span>
                 </DialogTrigger>
                 <Form {...form}>
-
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                       <DialogTitle>Confirmar Datos</DialogTitle>
                       <DialogDescription>
-                        Ingresa el correo eléctronico para restablecer contraseña.
+                        Ingresa el correo eléctronico para restablecer
+                        contraseña.
                       </DialogDescription>
                     </DialogHeader>
-                    <form className="space-y-3" onSubmit={formCorreo.handleSubmit(onSubmitPassword)}>
+                    <form
+                      className="space-y-3"
+                      onSubmit={formCorreo.handleSubmit(onSubmitPassword)}
+                    >
                       <FormField
                         control={formCorreo.control}
                         name="correo"
@@ -226,21 +233,22 @@ const LoginPage = () => {
                         )}
                       />
                       <DialogFooter>
-                        <Button disabled={formCorreoLoading} type="submit">Confirmar</Button>
+                        <Button disabled={formCorreoLoading} type="submit">
+                          Confirmar
+                        </Button>
                       </DialogFooter>
                     </form>
                   </DialogContent>
                 </Form>
-
               </Dialog>
-
 
               <Button
                 type="submit"
                 variant="default"
                 disabled={formLoading}
-                className={`${formLoading ? 'opacity-70 cursor-not-allowed' : ''
-                  } w-full`}
+                className={`${
+                  formLoading ? 'opacity-70 cursor-not-allowed' : ''
+                } w-full`}
               >
                 {formLoading && <Loader2 className="animate-spin" />}
 

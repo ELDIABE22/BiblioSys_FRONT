@@ -6,7 +6,6 @@ import {
   Settings,
   UsersRound,
 } from 'lucide-react';
-
 import { Separator } from '@/components/ui/separator';
 import {
   Sidebar,
@@ -28,6 +27,8 @@ import {
   CollapsibleTrigger,
 } from './ui/collapsible';
 import { Button } from './ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 // Menu items.
 const items = [
@@ -91,18 +92,20 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { logout, user } = useAuth();
+
   const location = useLocation();
 
   return (
     <Sidebar>
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup className="h-full">
           <SidebarGroupLabel className="uppercase font-bold text-primary text-xl tracking-widest mb-2">
             BiblioSys
           </SidebarGroupLabel>
           <Separator className="mb-5" />
-          <SidebarGroupContent>
-            <SidebarMenu className='flex justify-between'>
+          <SidebarGroupContent className="flex flex-col h-full justify-between">
+            <SidebarMenu>
               {items.map((item, index) =>
                 item.subItem.length > 0 ? (
                   <Collapsible
@@ -170,13 +173,27 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 )
               )}
-
-              <SidebarFooter>
-                <Button>
-                  Cerrar Sesión
-                </Button>
-              </SidebarFooter>
             </SidebarMenu>
+            <SidebarFooter>
+              <Button variant={'destructive'} onClick={logout} className='uppercase'>
+                Cerrar Sesión
+              </Button>
+
+              <div className="flex gap-3 items-center justify-center px-4 py-2 rounded-md bg-primary sm:hidden">
+                <Avatar className="bg-white">
+                  <AvatarImage src="/foto-perfil.png" alt="perfil" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-white text-sm">
+                    {`${user?.nombres.split(' ')[0]} ${
+                      user?.apellidos.split(' ')[0]
+                    }`}
+                  </p>
+                  <span className="text-gray-300 text-xs">{user?.rol}</span>
+                </div>
+              </div>
+            </SidebarFooter>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

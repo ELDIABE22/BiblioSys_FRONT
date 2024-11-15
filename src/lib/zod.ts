@@ -28,14 +28,15 @@ export const formResetPassword = z.object({
     .min(1, 'Se requiere')
     .min(6, 'Mínimo 6 caracteres')
     .max(15, 'Máximo 15 caracteres'),
-})
+});
 
 export const formCorreoSchema = z.object({
-  correo: z.string()
+  correo: z
+    .string()
     .trim()
     .min(1, 'Se requiere')
     .email('El correo no es válido'),
-})
+});
 
 export const formAuthorSubjectSchema = z.object({
   nombre: z
@@ -183,7 +184,7 @@ export const formLoanSchema = z.object({
       const month = date.getMonth() + 1;
       const day = date.getDate() + 1;
 
-      if (!(year === 2024)) {
+      if (!(year === new Date().getFullYear())) {
         return false;
       }
 
@@ -242,7 +243,7 @@ export const formLoanSchema = z.object({
       const month = date.getMonth() + 1;
       const day = date.getDate() + 1;
 
-      if (!(year === 2024)) {
+      if (!(year === new Date().getFullYear())) {
         return false;
       }
 
@@ -283,4 +284,14 @@ export const formLoanSchema = z.object({
     .trim()
     .optional()
     .refine((val) => !val || val.length >= 1, 'Se requiere'),
+});
+
+export const formMessageStudentSchema = z.object({
+  correo: z.string().trim(),
+  message: z
+    .string()
+    .trim()
+    .min(1, 'Se requiere')
+    .min(15, 'Mínimo 15 caracteres')
+    .max(255, 'Máximo 255 caracteres'),
 });

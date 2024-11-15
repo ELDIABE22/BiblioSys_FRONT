@@ -41,6 +41,7 @@ import DialogAuthorSubject from '../components/DialogAuthorSubject/DialogAuthorS
 import { ExportToExcel } from '@/components/ExportToExcel';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExportToPDF, { ITableConfig } from '@/components/ExportToPDF';
+import { useAuth } from '@/hooks/useAuth';
 
 const AuthorPage = () => {
   const [data, setData] = useState<IAuthorData[] | []>([]);
@@ -51,6 +52,8 @@ const AuthorPage = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const pageSize = 5;
+
+  const { user } = useAuth();
 
   const fetchAuthor = async () => {
     try {
@@ -110,30 +113,34 @@ const AuthorPage = () => {
     },
     {
       id: 'actions',
-      header: 'Acciones',
+      header: user?.rol === 'Administrador' ? 'Acciones' : '',
       enableHiding: false,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Abrir</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="space-y-1 max-w-11">
-            <DialogAuthorSubject
-              entity="AUTHOR"
-              method="PUT"
-              dataToUpdate={row.original}
-              fetchEntity={fetchAuthor}
-            />
-            <AlertDialogDeleteAuthorSubject
-              id={row.original.id}
-              fetchEntity={fetchAuthor}
-              entity="AUTHOR"
-            />
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          {user?.rol === 'Administrador' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Abrir</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="space-y-1 max-w-11">
+                <DialogAuthorSubject
+                  entity="AUTHOR"
+                  method="PUT"
+                  dataToUpdate={row.original}
+                  fetchEntity={fetchAuthor}
+                />
+                <AlertDialogDeleteAuthorSubject
+                  id={row.original.id}
+                  fetchEntity={fetchAuthor}
+                  entity="AUTHOR"
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </>
       ),
     },
   ];
@@ -165,11 +172,13 @@ const AuthorPage = () => {
   return (
     <section className="mx-5 space-y-5">
       <div className="flex space-x-1 max-w-24">
-        <DialogAuthorSubject
-          entity="AUTHOR"
-          method="POST"
-          fetchEntity={fetchAuthor}
-        />
+        {user?.rol === 'Administrador' && (
+          <DialogAuthorSubject
+            entity="AUTHOR"
+            method="POST"
+            fetchEntity={fetchAuthor}
+          />
+        )}
         <PDFDownloadLink
           document={
             <ExportToPDF

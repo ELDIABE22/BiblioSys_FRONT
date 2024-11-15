@@ -42,6 +42,7 @@ import AlertDialogDeleteUser from './components/AlertDialogDeleteUser/AlertDialo
 import { ExportToExcel } from '@/components/ExportToExcel';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExportToPDF, { ITableConfig } from '@/components/ExportToPDF';
+import { useAuth } from '@/hooks/useAuth';
 
 const UserPage = () => {
   const [data, setData] = useState<IUserData[] | []>([]);
@@ -52,6 +53,8 @@ const UserPage = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const pageSize = 5;
+
+  const { user } = useAuth();
 
   const fetchUsers = async () => {
     try {
@@ -168,30 +171,34 @@ const UserPage = () => {
         </Badge>
       ),
     },
-
     {
       id: 'actions',
+      header: user?.rol === 'Administrador' ? 'Acciones' : '',
       enableHiding: false,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Abrir</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="space-y-1 max-w-11">
-            <DialogUser
-              method="PUT"
-              dataToUpdate={row.original}
-              fetchUsers={fetchUsers}
-            />
-            <AlertDialogDeleteUser
-              userId={row.original.id}
-              fetchUsers={fetchUsers}
-            />
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          {user?.rol === 'Administrador' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Abrir</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="space-y-1 max-w-11">
+                <DialogUser
+                  method="PUT"
+                  dataToUpdate={row.original}
+                  fetchUsers={fetchUsers}
+                />
+                <AlertDialogDeleteUser
+                  userId={row.original.id}
+                  fetchUsers={fetchUsers}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </>
       ),
     },
   ];
@@ -223,7 +230,9 @@ const UserPage = () => {
   return (
     <section className="mx-5 space-y-5">
       <div className="flex space-x-1 max-w-24">
-        <DialogUser fetchUsers={fetchUsers} method="POST" />
+        {user?.rol === 'Administrador' && (
+          <DialogUser fetchUsers={fetchUsers} method="POST" />
+        )}
 
         <PDFDownloadLink
           document={

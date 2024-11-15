@@ -44,6 +44,7 @@ import { Badge } from '@/components/ui/badge';
 import { ExportToExcel } from '@/components/ExportToExcel';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExportToPDF, { ITableConfig } from '@/components/ExportToPDF';
+import { useAuth } from '@/hooks/useAuth';
 
 const BookPage = () => {
   const [data, setData] = useState<IBookData[] | []>([]);
@@ -54,6 +55,8 @@ const BookPage = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const pageSize = 5;
+
+  const { user } = useAuth();
 
   const fetchBooks = async () => {
     try {
@@ -185,27 +188,32 @@ const BookPage = () => {
     },
     {
       id: 'actions',
+      header: user?.rol === 'Administrador' ? 'Acciones' : '',
       enableHiding: false,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Abrir</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="space-y-1 max-w-11">
-            <DialogBook
-              method="PUT"
-              dataToUpdate={row.original}
-              fetchBooks={fetchBooks}
-            />
-            <AlertDialogDeleteBook
-              bookId={row.original.id}
-              fetchBooks={fetchBooks}
-            />
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          {user?.rol === 'Administrador' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Abrir</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="space-y-1 max-w-11">
+                <DialogBook
+                  method="PUT"
+                  dataToUpdate={row.original}
+                  fetchBooks={fetchBooks}
+                />
+                <AlertDialogDeleteBook
+                  bookId={row.original.id}
+                  fetchBooks={fetchBooks}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </>
       ),
     },
   ];
@@ -237,7 +245,9 @@ const BookPage = () => {
   return (
     <section className="mx-5 space-y-5">
       <div className="flex space-x-1 max-w-24">
-        <DialogBook method="POST" fetchBooks={fetchBooks} />
+        {user?.rol === 'Administrador' && (
+          <DialogBook method="POST" fetchBooks={fetchBooks} />
+        )}
 
         <PDFDownloadLink
           document={

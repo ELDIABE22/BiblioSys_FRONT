@@ -42,6 +42,7 @@ import DialogStudent from './components/DialogStudent/DialogStudent';
 import { ExportToExcel } from '@/components/ExportToExcel';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExportToPDF, { ITableConfig } from '@/components/ExportToPDF';
+import { useAuth } from '@/hooks/useAuth';
 
 const StudentPage = () => {
   const [data, setData] = useState<IStudentData[] | []>([]);
@@ -50,6 +51,8 @@ const StudentPage = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [pageIndex, setPageIndex] = useState(0);
+
+  const { user } = useAuth();
 
   const pageSize = 5;
 
@@ -186,10 +189,12 @@ const StudentPage = () => {
               dataToUpdate={row.original}
               fetchStudents={fetchStudents}
             />
-            <AlertDialogDeleteStudent
-              studentId={row.original.id}
-              fetchStudents={fetchStudents}
-            />
+            {user?.rol === "Administrador" && (
+              <AlertDialogDeleteStudent
+                studentId={row.original.id}
+                fetchStudents={fetchStudents}
+              />
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),

@@ -73,9 +73,9 @@ export const AuthProvider = ({ children }: Props) => {
 
   const logout = () => {
     Cookies.remove('token');
-    // Cookies.remove('userData');
+    Cookies.remove('userData');
 
-    window.location.href = '/';
+    window.location.href = '/auth/login';
 
     setIsAuthenticated(false);
     setUser(null);

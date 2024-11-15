@@ -41,6 +41,7 @@ import DialogAuthorSubject from '../components/DialogAuthorSubject/DialogAuthorS
 import { ExportToExcel } from '@/components/ExportToExcel';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExportToPDF, { ITableConfig } from '@/components/ExportToPDF';
+import { useAuth } from '@/hooks/useAuth';
 
 const SubjectPage = () => {
   const [data, setData] = useState<ISubjectData[] | []>([]);
@@ -51,6 +52,8 @@ const SubjectPage = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const pageSize = 5;
+
+  const { user } = useAuth();
 
   const fetchSubject = async () => {
     try {
@@ -110,30 +113,34 @@ const SubjectPage = () => {
     },
     {
       id: 'actions',
-      header: 'Acciones',
+      header: user?.rol === 'Administrador' ? 'Acciones' : '',
       enableHiding: false,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Abrir</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="space-y-1 max-w-11">
-            <DialogAuthorSubject
-              entity="SUBJECT"
-              method="PUT"
-              dataToUpdate={row.original}
-              fetchEntity={fetchSubject}
-            />
-            <AlertDialogDeleteAuthorSubject
-              id={row.original.id}
-              fetchEntity={fetchSubject}
-              entity="SUBJECT"
-            />
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          {user?.rol === 'Administrador' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Abrir</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="space-y-1 max-w-11">
+                <DialogAuthorSubject
+                  entity="SUBJECT"
+                  method="PUT"
+                  dataToUpdate={row.original}
+                  fetchEntity={fetchSubject}
+                />
+                <AlertDialogDeleteAuthorSubject
+                  id={row.original.id}
+                  fetchEntity={fetchSubject}
+                  entity="SUBJECT"
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </>
       ),
     },
   ];
@@ -165,11 +172,14 @@ const SubjectPage = () => {
   return (
     <section className="mx-5 space-y-5">
       <div className="flex space-x-1 max-w-24">
-        <DialogAuthorSubject
-          method="POST"
-          entity="SUBJECT"
-          fetchEntity={fetchSubject}
-        />
+        {user?.rol === 'Administrador' && (
+          <DialogAuthorSubject
+            method="POST"
+            entity="SUBJECT"
+            fetchEntity={fetchSubject}
+          />
+        )}
+
         <PDFDownloadLink
           document={
             <ExportToPDF

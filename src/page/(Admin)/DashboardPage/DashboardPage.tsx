@@ -9,38 +9,28 @@ import { useEffect, useState } from 'react';
 import axiosInstance from '@/lib/axios';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { IDetails } from './dashboardPage.type';
-import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart';
-
-const chartData = [
-  { month: 'January', desktop: 186 },
-  { month: 'February', desktop: 305 },
-  { month: 'March', desktop: 237 },
-  { month: 'April', desktop: 73 },
-  { month: 'May', desktop: 209 },
-  { month: 'June', desktop: 214 },
-];
-const chartConfig = {
-  desktop: {
-    label: 'Desktop', 
-    color: '#1b4dff',
-  },
-} satisfies ChartConfig;
+  IDetails,
+  ILoanAmountPerDay,
+  ILoanAmountPerMonth,
+  ITop5MostLoanedBooks,
+} from './dashboardPage.type';
+import { Card, CardHeader } from '@/components/ui/card';
+import CardLoanAmountPerDay from './components/CardLoanAmountPerDay/CardLoanAmountPerDay';
+import CardLoanAmountPerMonth from './components/CardLoanAmountPerMonth/CardLoanAmountPerMonth';
+import Top5MostLoanedBooks from './components/Top5MostLoanedBooks/Top5MostLoanedBooks';
 
 const DashboardPage = () => {
   const [details, setDetails] = useState<IDetails>();
+  const [loanAmountPerDay, setLoanAmountPerDay] = useState<
+    ILoanAmountPerDay[] | []
+  >([]);
+  const [loanAmountPerMonth, setLoanAmountPerMonth] = useState<
+    ILoanAmountPerMonth[] | []
+  >([]);
+  const [top5MostLoanedBooks, setTop5MostLoanedBooks] = useState<
+    ITop5MostLoanedBooks[] | []
+  >([]);
 
   const detailsItem = [
     {
@@ -73,12 +63,59 @@ const DashboardPage = () => {
     },
   ];
 
+  const colors = [
+    { color: '#1b4dff' },
+    { color: '#F71735' },
+    { color: '#00FF00' },
+    { color: '#FFA500' },
+    { color: '#FF1493' },
+    { color: '#8A2BE2' },
+    { color: '#FFD700' },
+    { color: '#FF4500' },
+    { color: '#32CD32' },
+    { color: '#00CED1' },
+    { color: '#FF6347' },
+    { color: '#4682B4' },
+  ];
+
+  const getRandomColor = (usedColors: number[]) => {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * colors.length);
+    } while (usedColors.includes(randomIndex));
+    usedColors.push(randomIndex);
+    return colors[randomIndex].color;
+  };
+
   const fetchCountEntity = async () => {
     try {
-      const res = await axiosInstance.get(
+      const { data } = await axiosInstance.get(
         `${import.meta.env.VITE_API_URL}/library/dashboard`
       );
-      setDetails(res.data);
+      let usedColors: number[] = [];
+      setLoanAmountPerDay(
+        data.cantidadPrestamosPorDia.map((item: ILoanAmountPerDay) => {
+          return { ...item, fill: getRandomColor(usedColors) };
+        })
+      );
+      usedColors = [];
+      setLoanAmountPerMonth(
+        data.cantidadPrestamosPorMes.map((item: ILoanAmountPerMonth) => {
+          return { ...item, fill: getRandomColor(usedColors) };
+        })
+      );
+      usedColors = [];
+      setTop5MostLoanedBooks(
+        data.top5LibrosMasPrestados.map((item: ITop5MostLoanedBooks) => {
+          return { ...item, fill: getRandomColor(usedColors) };
+        })
+      );
+      setDetails({
+        totalEstudiantes: data.totalEstudiantes,
+        totalLibros: data.totalLibros,
+        totalPrestamos: data.totalPrestamos,
+        totalUsuarios: data.totalUsuarios,
+      });
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (
@@ -118,10 +155,11 @@ const DashboardPage = () => {
 
   useEffect(() => {
     fetchCountEntity();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <section className="mx-5 space-y-5">
+    <section className="mx-5 space-y-5 mb-5">
       <Card className="px-5">
         <CardHeader className="items-center border-b-2 mb-10 pb-5">
           <h2 className="font-bold text-sm sm:text-xl">Panel Administrativo</h2>
@@ -137,43 +175,11 @@ const DashboardPage = () => {
         ))}
       </div>
 
-      <Card className="max-w-[600px]">
-        <CardHeader className='border-b-2'>
-          <CardTitle>Ultimos 7 dias de prestamos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig}>
-            <LineChart
-              accessibilityLayer
-              data={chartData}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Line
-                dataKey="desktop"
-                type="natural"
-                stroke="var(--color-desktop)"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col lg:flex-row gap-5">
+        <CardLoanAmountPerDay loanAmountPerDay={loanAmountPerDay} />
+        <Top5MostLoanedBooks top5MostLoanedBooks={top5MostLoanedBooks} />
+      </div>
+      <CardLoanAmountPerMonth loanAmountPerMonth={loanAmountPerMonth} />
     </section>
   );
 };

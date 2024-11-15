@@ -120,13 +120,44 @@ const DialogLoan: React.FC<DialogLoanProps> = ({
   ] as const;
 
   const onSubmit = async (values: z.infer<typeof formLoanSchema>) => {
+    const fechaDevolucion = values.fechaDevolucion
+      ? new Date(values.fechaDevolucion)
+      : null;
+    const fechaPrestamo = values.fechaPrestamo
+      ? new Date(values.fechaPrestamo)
+      : null;
+
+    if (fechaDevolucion && fechaPrestamo && fechaDevolucion < fechaPrestamo) {
+      return toast.error(
+        'La fecha de devolución no puede ser anterior a la fecha de préstamo.',
+        {
+          iconTheme: {
+            primary: '#1b4dff',
+            secondary: '#fff',
+          },
+        }
+      );
+    }
+
     setFormLoading(true);
 
     const data = {
       idEstudiante: parseInt(values.estudiante),
       idLibro: parseInt(values.libro),
-      fechaPrestamo: values.fechaPrestamo,
-      fechaDevolucion: values.fechaDevolucion,
+      fechaDevolucion: values.fechaDevolucion
+        ? new Date(
+            new Date(values.fechaDevolucion).setDate(
+              new Date(values.fechaDevolucion).getDate() + 2
+            )
+          )
+        : null,
+      fechaPrestamo: values.fechaPrestamo
+        ? new Date(
+            new Date(values.fechaPrestamo).setDate(
+              new Date(values.fechaPrestamo).getDate() + 2
+            )
+          )
+        : null,
       estado: values.estado,
     };
 
@@ -441,7 +472,7 @@ const DialogLoan: React.FC<DialogLoanProps> = ({
                       />
                     </FormControl>
                     <FormDescription className="text-xs">
-                      La fecha debe ser a partir de hoy.
+                      Las fechas deben ser a partir de hoy.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -464,9 +495,6 @@ const DialogLoan: React.FC<DialogLoanProps> = ({
                         className={`bg-gray-50 border-primary`}
                       />
                     </FormControl>
-                    <FormDescription className="text-xs">
-                      La fecha debe ser a partir de hoy.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
