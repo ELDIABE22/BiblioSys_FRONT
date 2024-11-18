@@ -73,8 +73,8 @@ const AlertDialogDeleteStudent: React.FC<AlertDialogDeleteStudentType> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no puede revertir. Eliminará permanentemente el
-            estudiante.
+            Esta acción no puede revertirse. Eliminará permanentemente al
+            estudiante y sus préstamos.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

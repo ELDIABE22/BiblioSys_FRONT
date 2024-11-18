@@ -61,7 +61,17 @@ const LoanPage = () => {
       const res = await axiosInstance.get(
         `${import.meta.env.VITE_API_URL}/library/loan`
       );
-      setData(res.data);
+      const sortedData = res.data.sort((a: ILoanData, b: ILoanData) => {
+        const dateA = new Date(a.fechaPrestamo).getTime();
+        const dateB = new Date(b.fechaPrestamo).getTime();
+        const estadoA = a.estado === 'Activo' || a.estado === 'Vencido' ? 1 : 0;
+        const estadoB = b.estado === 'Activo' || b.estado === 'Vencido' ? 1 : 0;
+        if (estadoA !== estadoB) {
+          return estadoB - estadoA;
+        }
+        return dateB - dateA;
+      });
+      setData(sortedData);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (

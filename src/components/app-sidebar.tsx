@@ -106,80 +106,92 @@ export function AppSidebar() {
           <Separator className="mb-5" />
           <SidebarGroupContent className="flex flex-col h-full justify-between">
             <SidebarMenu>
-              {items.map((item, index) =>
-                item.subItem.length > 0 ? (
-                  <Collapsible
-                    key={index}
-                    defaultOpen
-                    className="group/collapsible"
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton
+              {items
+                .filter(
+                  (item) =>
+                    !(
+                      user?.rol === 'Asistente' &&
+                      item.title === 'Administración'
+                    )
+                )
+                .map((item, index) =>
+                  item.subItem.length > 0 ? (
+                    <Collapsible
+                      key={index}
+                      defaultOpen
+                      className="group/collapsible"
+                    >
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton
+                            className={`${
+                              location.pathname === item.url &&
+                              'bg-primary text-white hover:bg-primary hover:text-white active:bg-primary active:text-white'
+                            } p-5 justify-between`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <item.icon size={16} />
+                              <span className="uppercase tracking-widest">
+                                {item.title}
+                              </span>
+                            </div>
+                            <ChevronRight />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub className="border-l-primary">
+                            {item.subItem.map((item, index) => (
+                              <SidebarMenuSubItem key={index}>
+                                <SidebarMenuButton asChild>
+                                  <a
+                                    href={item.url}
+                                    className={`${
+                                      location.pathname === item.url &&
+                                      'bg-primary text-white hover:bg-primary hover:text-white active:bg-primary active:text-white'
+                                    } p-5`}
+                                  >
+                                    <item.icon />
+                                    <span className="uppercase tracking-widest">
+                                      {item.title}
+                                    </span>
+                                  </a>
+                                </SidebarMenuButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  ) : (
+                    <SidebarMenuItem key={index}>
+                      <SidebarMenuButton asChild>
+                        <a
+                          href={item.url}
                           className={`${
                             location.pathname === item.url &&
                             'bg-primary text-white hover:bg-primary hover:text-white active:bg-primary active:text-white'
-                          } p-5 justify-between`}
+                          } p-5`}
                         >
-                          <div className="flex items-center gap-2">
-                            <item.icon size={16} />
-                            <span className="uppercase tracking-widest">
-                              {item.title}
-                            </span>
-                          </div>
-                          <ChevronRight />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub className="border-l-primary">
-                          {item.subItem.map((item, index) => (
-                            <SidebarMenuSubItem key={index}>
-                              <SidebarMenuButton asChild>
-                                <a
-                                  href={item.url}
-                                  className={`${
-                                    location.pathname === item.url &&
-                                    'bg-primary text-white hover:bg-primary hover:text-white active:bg-primary active:text-white'
-                                  } p-5`}
-                                >
-                                  <item.icon />
-                                  <span className="uppercase tracking-widest">
-                                    {item.title}
-                                  </span>
-                                </a>
-                              </SidebarMenuButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
+                          <item.icon />
+                          <span className="uppercase tracking-widest">
+                            {item.title}
+                          </span>
+                        </a>
+                      </SidebarMenuButton>
                     </SidebarMenuItem>
-                  </Collapsible>
-                ) : (
-                  <SidebarMenuItem key={index}>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href={item.url}
-                        className={`${
-                          location.pathname === item.url &&
-                          'bg-primary text-white hover:bg-primary hover:text-white active:bg-primary active:text-white'
-                        } p-5`}
-                      >
-                        <item.icon />
-                        <span className="uppercase tracking-widest">
-                          {item.title}
-                        </span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              )}
+                  )
+                )}
             </SidebarMenu>
             <SidebarFooter>
-              <Button variant={'destructive'} onClick={logout} className='uppercase'>
+              <Button
+                variant={'destructive'}
+                onClick={logout}
+                className="uppercase"
+              >
                 Cerrar Sesión
               </Button>
 
-              <div className="flex gap-3 items-center justify-center px-4 py-2 rounded-md bg-primary sm:hidden">
+              <div className="flex gap-3 items-center justify-center px-4 py-2 rounded-md bg-primary lg:hidden">
                 <Avatar className="bg-white">
                   <AvatarImage src="/foto-perfil.png" alt="perfil" />
                   <AvatarFallback>CN</AvatarFallback>

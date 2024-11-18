@@ -94,9 +94,15 @@ const DashboardPage = () => {
       );
       let usedColors: number[] = [];
       setLoanAmountPerDay(
-        data.cantidadPrestamosPorDia.map((item: ILoanAmountPerDay) => {
-          return { ...item, fill: getRandomColor(usedColors) };
-        })
+        data.cantidadPrestamosPorDia
+          .sort(
+            (a: ILoanAmountPerDay, b: ILoanAmountPerDay) =>
+              new Date(b.dia).getTime() - new Date(a.dia).getTime()
+          )
+          .slice(0, 10)
+          .map((item: ILoanAmountPerDay) => {
+            return { ...item, fill: getRandomColor(usedColors) };
+          })
       );
       usedColors = [];
       setLoanAmountPerMonth(
@@ -161,7 +167,7 @@ const DashboardPage = () => {
   return (
     <section className="mx-5 space-y-5 mb-5">
       <Card className="px-5">
-        <CardHeader className="items-center border-b-2 mb-10 pb-5">
+        <CardHeader className="items-center border-b-2 border-primary mb-10 pb-5">
           <h2 className="font-bold text-sm sm:text-xl">Panel Administrativo</h2>
           <p className="text-sm sm:text-base">
             Reportes gráficos del sistema de biblioteca

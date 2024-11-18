@@ -23,6 +23,7 @@ import React, { useEffect, useState } from 'react';
 
 const Navbar: React.FC<NavbarProps> = ({ fetchLoansOverdue }) => {
   const [data, setData] = useState<ILoansOverdueData[] | []>([]);
+  const [currentTime, setCurrentTime] = useState<string>('');
 
   const { user } = useAuth();
 
@@ -52,8 +53,20 @@ const Navbar: React.FC<NavbarProps> = ({ fetchLoansOverdue }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      setCurrentTime(`${hours}:${minutes}:${seconds}`);
+    };
+    const intervalId = setInterval(updateTime, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
-    <nav className="flex items-center px-5 justify-between h-16 w-full bg-primary">
+    <nav className="flex items-center px-2 sm:px-5 justify-between h-16 w-full bg-primary">
       <Breadcrumb>
         <BreadcrumbList className="text-white">
           <BreadcrumbItem>
@@ -69,6 +82,8 @@ const Navbar: React.FC<NavbarProps> = ({ fetchLoansOverdue }) => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div className="text-white text-sm">{currentTime}</div>
 
       <div className="flex h-full items-center">
         <Popover>
@@ -115,10 +130,10 @@ const Navbar: React.FC<NavbarProps> = ({ fetchLoansOverdue }) => {
 
         <Separator
           orientation="vertical"
-          className="hidden mx-4 text-white/20 sm:block"
+          className="hidden mx-4 text-white/20 lg:block"
         />
 
-        <div className="hidden gap-3 items-center sm:flex">
+        <div className="hidden gap-3 items-center lg:flex">
           <Avatar className="bg-white">
             <AvatarImage src="/foto-perfil.png" alt="perfil" />
             <AvatarFallback>CN</AvatarFallback>

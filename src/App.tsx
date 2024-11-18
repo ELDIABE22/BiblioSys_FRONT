@@ -10,6 +10,7 @@ import StudentPage from './page/(Admin)/StudentPage/StudentPage';
 import UserPage from './page/(Admin)/UserPage/UserPage';
 import LoanPage from './page/(Admin)/LoanPage/LoanPage';
 import ResetPasswordForm from './page/(Auth)/ResetPasswordPage/ResetPasswordPage';
+import ConfigPage from './page/(Admin)/ConfigPage/ConfigPage';
 
 function App() {
   const adminPaths = [
@@ -40,6 +41,10 @@ function App() {
     {
       path: '/library/admin/loan',
       componentPage: <LoanPage />,
+    },
+    {
+      path: '/library/admin/config',
+      componentPage: <ConfigPage />,
     },
   ];
 

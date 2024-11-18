@@ -64,7 +64,9 @@ const DialogLoan: React.FC<DialogLoanProps> = ({
       const students = await studentsResponse.data;
 
       setBooks(books);
-      setStudents(students);
+      setStudents(
+        students.filter((item: IStudentData) => item.estado !== 'Inactivo')
+      );
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (
